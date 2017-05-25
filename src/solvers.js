@@ -108,12 +108,16 @@ window.countNQueensSolutions = function(n) {
     }
   };
 
-
-  for (var i = 0; i < n; i++) {
-    board.togglePiece(0, i);
-    recursor(board, [[0,i]], 1);
-    board.togglePiece(0, i);
+  if (n === 0) {
+    solutionCount++;
+  } else {
+    for (var i = 0; i < n; i++) {
+      board.togglePiece(0, i);
+      recursor(board, [[0,i]], 1);
+      board.togglePiece(0, i);
+    }
   }
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
+
 };
