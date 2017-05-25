@@ -69,10 +69,58 @@ window.countNRooksSolutions = function(n) {
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var solution = undefined; //fixme
+  var board = new Board({n: n});
+  var solution;
 
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
-  return solution;
+  var recursor = function (board, placedPieces, rowToCheck) {
+    var board = new Board({n: n});
+    placedPieces.map(function(cur) {
+      board.togglePiece(cur[0],cur[1]);
+    });
+    if(placedPieces.length === n) {
+      solution = board.rows();
+      return solution;
+    } else if (rowToCheck < n) {
+      for(var i = 0; i < board.get(rowToCheck).length; i++) {
+        board.togglePiece(rowToCheck, i);
+        if (board.hasAnyQueensConflicts() === false) {
+          if ((placedPieces.length + 1) === n) {
+            solution = board.rows();
+            return board.rows();
+          } else {
+            var checker = recursor(board, placedPieces.concat([[rowToCheck, i]]), rowToCheck + 1);
+            if (checker === undefined) {
+              board.togglePiece(rowToCheck,i);
+            }
+          }
+        } else {
+          board.togglePiece(rowToCheck, i);
+        }
+      }
+    }
+  };
+
+  if (n === 0) {
+    solution = board.rows();
+    return solution;
+  } else if (n === 1) {
+    solution = [[1]];
+    return solution;
+  } else {
+    //loop through all possible first piece spots
+    for (var i = 0; i < n; i++) {
+      board.togglePiece(0, i);
+      recursor(board, [[0,i]], 1);
+      if (solution) {
+        return solution;
+      }
+      board.togglePiece(0, i);
+    }
+    //console.log('no result found n='+n);
+    return (new Board({n: n})).rows();
+  }
+
+
 };
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
