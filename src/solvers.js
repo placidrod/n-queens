@@ -13,7 +13,20 @@
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n rooks placed such that none of them can attack each other
 
-
+window.findSolution = function (board, rowToCheck, n, validator, callback) {
+  if(rowToCheck === n) {
+    callback();
+    return;
+  }
+  for(var i = 0; i < n; i++) {
+    board.togglePiece(rowToCheck, i);
+    //console.log(n, i, rowToCheck, JSON.stringify(board.rows()));
+    if(board[validator]() === false) {
+      findSolution(board, rowToCheck+1, n, validator, callback);
+    }
+    board.togglePiece(rowToCheck, i);
+  }
+};
 
 window.findNRooksSolution = function(n) {
   var solution = new Board({n: n}); //fixme
@@ -26,43 +39,12 @@ window.findNRooksSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  //loop through all possible first piece spots
+
   var board = new Board({n: n});
   var solutionCount = 0;
-  var recursor = function (board, placedPieces, rowToCheck) {
-    if(placedPieces.length === n) {
-      //console.log('adding to solution count');
-      solutionCount++;
-    } else if (rowToCheck < n) {
-      for(var i = 0; i < board.get(rowToCheck).length; i++) {
-        //loop through every place in the row and place a piece there
-        board.togglePiece(rowToCheck, i);
-        //check for rook conflicts
-        if(board.hasAnyRooksConflicts() === false) {
-          // are conflicts -> toggle the square back off
-          //console.log('found a solution', placedPieces.concat([[rowToCheck, i]]));
-          recursor(board, placedPieces.concat([[rowToCheck, i]]), rowToCheck+1);
-        }
-        board.togglePiece(rowToCheck, i);
-      }
-      // no conflicts ->  toggle the square back off, add to availPieces
-      //end loop
-      // if available pieces > 0, for each piece
-      //toggle piece
-      //recursive call( board, placed pieces .concat(curPiece))
-      //toggle piece off
-      //end of available pieces loop
-      // end of pieces count
-
-    }
-  };
-
-
-  for (var i = 0; i < n; i++) {
-    board.togglePiece(0, i);
-    recursor(board, [[0,i]], 1);
-    board.togglePiece(0, i);
-  }
+  findSolution(board, 0, n, 'hasAnyRooksConflicts', function(){
+    solutionCount++;
+  });
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
 };
@@ -128,43 +110,9 @@ window.countNQueensSolutions = function(n) {
   //loop through all possible first piece spots
   var board = new Board({n: n});
   var solutionCount = 0;
-  var recursor = function (board, placedPieces, rowToCheck) {
-    if(placedPieces.length === n) {
-      //console.log('adding to solution count');
-      solutionCount++;
-    } else if (rowToCheck < n) {
-      for(var i = 0; i < board.get(rowToCheck).length; i++) {
-        //loop through every place in the row and place a piece there
-        board.togglePiece(rowToCheck, i);
-        //check for rook conflicts
-        if(board.hasAnyQueensConflicts() === false) {
-          // are conflicts -> toggle the square back off
-          //console.log('found a solution', placedPieces.concat([[rowToCheck, i]]));
-          recursor(board, placedPieces.concat([[rowToCheck, i]]), rowToCheck+1);
-        }
-        board.togglePiece(rowToCheck, i);
-      }
-      // no conflicts ->  toggle the square back off, add to availPieces
-      //end loop
-      // if available pieces > 0, for each piece
-      //toggle piece
-      //recursive call( board, placed pieces .concat(curPiece))
-      //toggle piece off
-      //end of available pieces loop
-      // end of pieces count
-
-    }
-  };
-
-  if (n === 0) {
+  findSolution(board, 0, n, 'hasAnyQueensConflicts', function(){
     solutionCount++;
-  } else {
-    for (var i = 0; i < n; i++) {
-      board.togglePiece(0, i);
-      recursor(board, [[0,i]], 1);
-      board.togglePiece(0, i);
-    }
-  }
+  });
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 

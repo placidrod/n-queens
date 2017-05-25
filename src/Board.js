@@ -81,6 +81,7 @@
     //
     // test if a specific row on this board contains a conflict
     hasRowConflictAt: function(rowIndex) {
+      //console.log(rowIndex, this);
       var results = this.get(rowIndex).reduce(function(sum, cur) {
         return sum + cur;
       }, 0);
