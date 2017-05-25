@@ -27,28 +27,42 @@ window.findNRooksSolution = function(n) {
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
   //loop through all possible first piece spots
+  var board = new Board({n: n});
   var solutionCount = 0;
-  var availPieces = [];
-  for (var i = 0; i < n; i++) {
-    for (var j = 0; j < n; j++) {
-      availPieces.push([i, j]);
+  var recursor = function (board, placedPieces, rowToCheck) {
+    if(placedPieces.length === n) {
+      //console.log('adding to solution count');
+      solutionCount++;
+    } else if (rowToCheck < n) {
+      for(var i = 0; i < board.get(rowToCheck).length; i++) {
+        //loop through every place in the row and place a piece there
+        board.togglePiece(rowToCheck, i);
+        //check for rook conflicts
+        if(board.hasAnyRooksConflicts() === false) {
+          // are conflicts -> toggle the square back off
+          //console.log('found a solution', placedPieces.concat([[rowToCheck, i]]));
+          recursor(board, placedPieces.concat([[rowToCheck, i]]), rowToCheck+1);
+        }
+        board.togglePiece(rowToCheck, i);
+      }
+      // no conflicts ->  toggle the square back off, add to availPieces
+      //end loop
+      // if available pieces > 0, for each piece
+      //toggle piece
+      //recursive call( board, placed pieces .concat(curPiece))
+      //toggle piece off
+      //end of available pieces loop
+      // end of pieces count
+
     }
-  }
-  var curPieces = [];
-  curPieces.push(availPieces.shift());
-  var recursor = function (board, pieces) {
-    // availPieces.length > 0
-      // curPieces.length !== n
-        // create a new board and toggle all Current Pieces on
-        //loop through every availPiece and place a piece there
-          //check for rook conflicts
-             // no conflicts ->  toggle the square back off, leave the piece in availPieces
-             // are conflicts -> toggle the square back off, and remove that piece from availPieces
-        //end loop
-      // else add 1 to the solution tracking variable
-    //end of conditional no available pieces
   };
 
+
+  for (var i = 0; i < n; i++) {
+    board.togglePiece(0, i);
+    recursor(board, [[0,i]], 1);
+    board.togglePiece(0, i);
+  }
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
 };
@@ -63,8 +77,43 @@ window.findNQueensSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  //loop through all possible first piece spots
+  var board = new Board({n: n});
+  var solutionCount = 0;
+  var recursor = function (board, placedPieces, rowToCheck) {
+    if(placedPieces.length === n) {
+      //console.log('adding to solution count');
+      solutionCount++;
+    } else if (rowToCheck < n) {
+      for(var i = 0; i < board.get(rowToCheck).length; i++) {
+        //loop through every place in the row and place a piece there
+        board.togglePiece(rowToCheck, i);
+        //check for rook conflicts
+        if(board.hasAnyQueensConflicts() === false) {
+          // are conflicts -> toggle the square back off
+          //console.log('found a solution', placedPieces.concat([[rowToCheck, i]]));
+          recursor(board, placedPieces.concat([[rowToCheck, i]]), rowToCheck+1);
+        }
+        board.togglePiece(rowToCheck, i);
+      }
+      // no conflicts ->  toggle the square back off, add to availPieces
+      //end loop
+      // if available pieces > 0, for each piece
+      //toggle piece
+      //recursive call( board, placed pieces .concat(curPiece))
+      //toggle piece off
+      //end of available pieces loop
+      // end of pieces count
 
+    }
+  };
+
+
+  for (var i = 0; i < n; i++) {
+    board.togglePiece(0, i);
+    recursor(board, [[0,i]], 1);
+    board.togglePiece(0, i);
+  }
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
